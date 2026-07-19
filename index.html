@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weblingo — Learn digital & AI tools</title>
+
+  <!-- Google Fonts: a mono-adjacent display face + a clean body face + a real mono face for "prompt" UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- App shell: one <main> element, JS swaps what's inside it between screens -->
+  <div class="app-shell">
+
+    <header class="topbar">
+      <div class="logo">
+        <span class="logo-bracket">&lt;</span>Weblingo<span class="logo-bracket">/&gt;</span>
+      </div>
+      <div class="streak-badge" id="streak-badge" hidden>
+        <span class="streak-flame">●</span> <span id="streak-count">0</span> day streak
+      </div>
+    </header>
+
+    <main id="app-root">
+      <!-- Screens are injected here by app.js -->
+    </main>
+
+    <footer class="foot-note">Weblingo · a friendlier way into AI tools</footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
