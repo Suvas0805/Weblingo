@@ -762,7 +762,7 @@ function renderSubjectQuiz() {
 
     ${
       state.subjectQuestionIndex === 0
-        ? `<div class="honesty-note"><span>👆</span><span>Look up — answer honestly, based on what you'd actually do. It's the only way this test can place you accurately.</span><span>👆</span></div>`
+   ? `<div class="honesty-note"><span>👆</span><span>Look up — answer honestly, based on what you'd actually do. It's the only way this test can place you accurately.</span><span>👆</span></div>`
         : ""
     }
 
