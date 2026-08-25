@@ -531,44 +531,42 @@ main { flex: 1; }
 
 /* ---------- Subjects screen ---------- */
 .subject-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 32px;
-}
+          <!-- MOUNTAIN CREST PATH CONTAINER -->
+        <div class="mountain-path-container mt-8 bg-white rounded-2xl border border-slate-200 shadow-sm min-h-[500px]">
+          <!-- The physical ridge connecting all lessons -->
+          <div class="mountain-crest-line"></div>
+          
+          <div class="flex flex-col items-center gap-6 py-12">
+            ${Object.entries(subjectData).map(([unitId, lessons]) => {
+              return lessons.map((lesson, index) => {
+                // Loops 0 to 4 repeatedly to create the winding crest depth effect
+                const depthLevel = index % 5;
+                const isCompleted = user.completedLessons.includes(lesson.id);
+                const isCurrent = user.currentLessonId === lesson.id;
+                const isLocked = !isCompleted && !isCurrent;
+                
+                let btnClass = "w-16 h-16 rounded-full flex items-center justify-center font-bold text-lg shadow-md transition-all duration-300 ";
+                if (isCompleted) btnClass += "bg-emerald-500 text-white hover:bg-emerald-600";
+                else if (isCurrent) btnClass += "bg-blue-600 text-white ring-4 ring-blue-200 animate-pulse-subtle";
+                else btnClass += "bg-slate-200 text-slate-400 cursor-not-allowed";
 
-.subject-card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--amber);
-  border-radius: var(--radius-sm);
-  padding: 14px 18px;
-}
-.subject-name {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 15.5px;
-  margin-bottom: 3px;
-}
-.subject-blurb {
-  font-size: 13.5px;
-  color: var(--text-dim);
-}
+                return `
+                  <div class="mountain-node-wrapper node-depth-${depthLevel}">
+                    <button 
+                      onclick="${isLocked ? '' : `startLesson('${currentSubjectId}', '${unitId}', '${lesson.id}')`}"
+                      class="${btnClass}"
+                      ${isLocked ? 'disabled' : ''}
+                      title="${lesson.title}"
+                    >
+                      ${isCompleted ? '✓' : index + 1}
+                    </button>
+                  </div>
+                `;
+              }).join('');
+            }).join('')}
+          </div>
+        </div>
 
-.subject-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-  flex-wrap: wrap;
-}
-
-.btn-small {
-  padding: 9px 14px;
-  font-size: 13px;
-}
-
-.subject-status {
-  margin-top: 10px;
   font-size: 13.5px;
   color: var(--mint);
   display: flex;
