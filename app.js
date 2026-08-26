@@ -894,66 +894,48 @@ function renderAccountWelcome() {
 // every lesson is written.
 // ---------------------------------------------------------------------------
 function renderLessonPath() {
-  const subject = SUBJECTS.find((s) => s.id === state.lessonSubjectId);
-  const unitLessons = (LESSONS[state.lessonSubjectId] && LESSONS[state.lessonSubjectId].unit1) || [];
-
-  // Horizontal position (as a % of the path's width) for each node, walking
-  // left-right-left down the page — this is what gives the zigzag "ridge"
-  // look instead of a plain vertical list. Repeats if there are ever more
-  // than 5 lessons in a unit.
-  const ZIGZAG_LEFT_PCT = [22, 58, 32, 68, 45];
-  const NODE_SPACING = 128; // vertical px between node centers
+  const user = state.user;
+  const currentSubjectId = state.currentSubject || "chat-prompting";
+  const subjectData = LESSONS[currentSubjectId] || {};
 
   return `
-    <section>
-      <div class="result-eyebrow">${subject.name} · Unit 1</div>
-      <h1 class="result-title">Lesson path</h1>
-      <div class="mountain-path" style="height:${unitLessons.length * NODE_SPACING + 40}px;">
-        ${unitLessons
-          .map((lesson, i) => {
-            const built = Boolean(lesson.steps);
-            const progress = state.lessonProgress[lesson.id];
-            const isPerfect = built && progress && progress.perfect;
-            const isCompleted = built && progress && !progress.perfect;
-
-            let subLine = "Coming soon";
-            if (built) subLine = lesson.subtitle;
-            if (isCompleted) subLine = `Completed · ${progress.mistakes} mistake${progress.mistakes === 1 ? "" : "s"}`;
-            if (isPerfect) subLine = "✓ Perfect — no need to retake";
-
-            // A perfect run locks the lesson entirely (not clickable at all).
-            const clickable = built && !isPerfect;
-            const leftPct = ZIGZAG_LEFT_PCT[i % ZIGZAG_LEFT_PCT.length];
-            const topPx = i * NODE_SPACING;
+    <!-- MOUNTAIN CREST PATH CONTAINER -->
+    <div class="mountain-path-container mt-8 bg-white rounded-2xl border border-slate-200 shadow-sm min-h-[600px] relative overflow-hidden">
+      <!-- The physical ridge connecting all lessons -->
+      <div class="mountain-crest-line"></div>
+      
+      <div class="flex flex-col items-center gap-12 py-16 relative z-10">
+        ${Object.entries(subjectData).map(([unitId, lessons]) => {
+          return lessons.map((lesson, index) => {
+            const depthLevel = index % 5;
+            const isCompleted = user.completedLessons.includes(lesson.id);
+            const isCurrent = user.currentLessonId === lesson.id;
+            const isLocked = !isCompleted && !isCurrent;
+            
+            let btnClass = "w-16 h-16 rounded-full flex items-center justify-center font-bold text-lg shadow-md transition-all duration-300 ";
+            if (isCompleted) btnClass += "bg-emerald-500 text-white hover:bg-emerald-600";
+            else if (isCurrent) btnClass += "bg-blue-600 text-white ring-4 ring-blue-200 animate-pulse-subtle";
+            else btnClass += "bg-slate-200 text-slate-400 cursor-not-allowed";
 
             return `
-          <div class="mountain-node-wrap" style="left:${leftPct}%; top:${topPx}px;">
-            <svg class="mountain-peak" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="mtn-grad-${lesson.id}" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" style="stop-color:var(--mint); stop-opacity:0.6" />
-                  <stop offset="100%" style="stop-color:var(--mint); stop-opacity:0.18" />
-                </linearGradient>
-              </defs>
-              <path d="M0,80 C12,42 22,18 38,12 C46,9 54,9 62,13 C80,21 90,45 100,80 Z" fill="url(#mtn-grad-${lesson.id})" />
-            </svg>
-            <button class="mountain-node ${clickable ? "mountain-node-ready" : "mountain-node-locked"} ${isPerfect ? "mountain-node-perfect" : ""}" ${clickable ? `data-lesson="${lesson.id}"` : "disabled"}>
-              ${isPerfect ? "★" : i + 1}
-            </button>
-            <div class="mountain-node-label">
-              <div class="mountain-node-title">${lesson.title}</div>
-              <div class="mountain-node-sub">${subLine}</div>
-            </div>
-          </div>`;
-          })
-          .join("")}
+              <div class="mountain-node-wrapper node-depth-${depthLevel}">
+                <button 
+                  onclick="${isLocked ? '' : `startLesson('${currentSubjectId}', '${unitId}', '${lesson.id}')`}"
+                  class="${btnClass}"
+                  ${isLocked ? 'disabled' : ''}
+                  title="${lesson.title}"
+                >
+                  ${isCompleted ? '✓' : index + 1}
+                </button>
+              </div>
+            `;
+          }).join('');
+        }).join('')}
       </div>
-      <div class="hero-actions">
-        <button class="btn btn-ghost" id="lesson-path-back-btn">Back</button>
-      </div>
-    </section>
+    </div>
   `;
 }
+
 
 // ---------------------------------------------------------------------------
 // 4i. LESSON — runs one step at a time from the active lesson's `steps`
